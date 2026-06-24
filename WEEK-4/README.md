@@ -1,83 +1,106 @@
-# Week 4 — RL Environment Design & Training
+# Week 4 - Reinforcement Learning
 
-This week you will learn how to build your own reinforcement learning environment and train an agent to solve it.
+This week was focused on learning the basics of Reinforcement Learning (RL) and understanding how agents learn by interacting with an environment.
 
-## Resources
+## What I Learned
 
-- [Official Gymnasium Documentation](https://gymnasium.farama.org/introduction/create_custom_env/)
-- [Video Tutorial](https://www.youtube.com/watch?v=bD6V3rcr_54)
-- [Example Environment Implementation](https://gymnasium.farama.org/tutorials/gymnasium_basics/environment_creation/)
+### Reinforcement Learning Basics
 
-## Task 1 — CartPole (Warmup)
+In Reinforcement Learning, an agent learns by taking actions in an environment and receiving rewards based on those actions.
 
-Run this file to see a pre-built environment in action:
+The main components are:
 
-```
-python3 cartpole.py
-```
+- Agent
+- Environment
+- Observation (State)
+- Action
+- Reward
 
-Read the code. It creates a CartPole environment from Gymnasium, trains a PPO agent on it, and then lets the trained agent balance the pole. Learn more about cartpole from [here](https://gymnasium.farama.org/environments/classic_control/cart_pole/)
+The goal of the agent is to maximize the total reward it receives.
 
+### Gymnasium Environments
 
-## Task 2 — Maze
+I learned how RL environments are implemented using Gymnasium.
 
-You need to train an agent to navigate from the start to the goal in a maze. The maze has walls (1)and paths (0). The agent can move up, right, down, or left.
+Important methods in a custom environment:
 
-Example Maze layout:
-```
-1 1 1 1 1 1 1 1 1 1
-1 0 0 0 1 0 0 0 0 1
-1 0 1 0 1 0 1 1 0 1
-1 0 1 0 0 0 0 0 0 1
-1 0 1 1 1 1 1 1 0 1
-1 0 0 0 0 0 0 1 0 1
-1 1 1 0 1 1 0 1 0 1
-1 0 0 0 1 0 0 1 0 1
-1 0 1 0 0 0 1 0 0 1
-1 1 1 1 1 1 1 1 1 1
-```
-Start is at (1,1) and end at (8,8)
-You need to complete the MazeEnv class in `maze_train.py`.
+- `__init__()` – initialize the environment
+- `reset()` – start a new episode
+- `step(action)` – execute an action and return the result
+- `_get_obs()` – generate observations for the agent
+- `_render_rgb()` – visualize the environment
 
-### Function Specifics
+### Observation Space
 
-`__init__`
-It stores the action space, observation space, maze layout, the start position, and the goal position.
-- `self.action_space = spaces.Discrete(4)` means the agent has 4 choices: up, right, down, and left.
-- `self.observation_space = Box(0, 3, (1, 10, 10), np.int8)` means the observation is a 10 by 10 grid where each cell has a value between 0 and 3. The (1, 10, 10) shape means there is one channel (like a black-and-white image) with 10 rows and 10 columns. You may want to use float32 and a normalized cell value for better results.
+The observation space defines what information the agent can see.
 
-`_get_obs(self)`
-This function turns the current maze and agent position into a numpy array.
-The returned array should have shape `(1, 10, 10)` and use these values:
-- `0` for empty path cells
-- `1` for wall cells
-- `2` for the goal cell
-- `3` for the agent's current position
-- Normalize them to [0,1]. 
-  
-`reset(self, seed=None)`
-This function is called every time a new episode starts. It puts the agent back at the start position.
-Read the documentation once for more detailed information.
+In the maze environment:
+- Walls
+- Empty cells
+- Goal position
+- Agent position
 
-`step(self, action)`
-This function updates the agent's position based on the chosen action. It should check whether the move is valid, apply rewards, and determine if the goal has been reached. A positive reward is given for reaching the goal, while small penalties encourage the agent to avoid invalid moves and find efficient paths. The function then returns the outcome of the action.
+were encoded into a NumPy array and provided to the agent as observations.
 
-`_render_rgb(self)`
-This function creates a colour representation of the maze using a NumPy array. This array is used to render the maze using the blit function. Make sure to check its use case in maze.py
+I also learned why observations are often normalized and stored as `float32` values.
 
-### Do this after you are done:
+### Action Space
 
-Install dependencies:
-```
-pip install -r requirements.txt
-```
+The action space defines the actions available to the agent.
 
-First, train the agent:
-```
-python3 maze_train.py
-```
+For the maze environment:
 
-Then watch it solve the maze:
-```
-python3 maze.py
-```
+- Up
+- Right
+- Down
+- Left
+
+were represented using a discrete action space.
+
+### Rewards
+
+I learned that reward design is one of the most important parts of Reinforcement Learning.
+
+For the maze environment:
+
+- Reaching the goal gives a positive reward
+- Hitting a wall gives a penalty
+- Revisiting cells gives a penalty
+- Normal movement gives a small penalty
+
+These rewards encourage the agent to find efficient paths to the goal.
+
+### Terminated vs Truncated
+
+I learned the difference between:
+
+- `terminated` – the episode ended because the objective was reached
+- `truncated` – the episode ended because a limit such as maximum steps was reached
+
+### PPO (Proximal Policy Optimization)
+
+I learned about PPO, a popular Reinforcement Learning algorithm available in Stable-Baselines3.
+
+PPO improves the agent's policy using experience collected from interactions with the environment while maintaining stable learning.
+
+## Practical Implementation
+
+As part of this week, I implemented a custom Maze environment using Gymnasium.
+
+The environment included:
+
+- A custom observation space
+- A discrete action space
+- Reward design
+- Episode reset and termination logic
+- RGB rendering for visualization
+
+I then trained an agent using PPO and successfully tested it on the maze.
+
+## Key Takeaways
+
+- Reinforcement Learning is based on learning through rewards rather than labeled data.
+- Reward design has a significant impact on agent behavior.
+- Observation and action spaces are fundamental to environment design.
+- Gymnasium provides a standard framework for creating RL environments.
+- PPO can successfully learn policies for custom environments.
